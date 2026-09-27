@@ -14,6 +14,19 @@ Find the source code here: [fsh2502/XrayR](https://github.com/fsh2502/XrayR)
 ```
 bash <(curl -Ls https://raw.githubusercontent.com/fsh2502/XrayR-release/master/install.sh)
 ```
+
+# Cài nhanh + cấu hình tự động
+
+Lệnh dưới đây sẽ cài XrayR, lần lượt hỏi domain, loại panel, API URL/key, Node ID và loại
+node, sau đó tự ghi `/etc/XrayR/config.yml`. Khi chọn Trojan + TLS, script tự tạo chứng
+chỉ tự ký và lưu vào `/etc/XrayR/cert/`.
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/fsh2502/XrayR-release/master/quick-install.sh)
+```
+
+Với Trojan TLS, node trên panel cũng phải bật TLS. Vì đây là chứng chỉ tự ký, client phải
+tin cậy chứng chỉ hoặc bật `allowInsecure`.
 # Docker 安装
 
 ```
