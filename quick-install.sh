@@ -13,6 +13,7 @@ CONFIG_FILE="${XRAYR_CONFIG_FILE:-/etc/XrayR/config.yml}"
 CERT_DIR="${XRAYR_CERT_DIR:-/etc/XrayR/cert}"
 SKIP_INSTALL="${XRAYR_SKIP_INSTALL:-0}"
 SKIP_SERVICE="${XRAYR_SKIP_SERVICE:-0}"
+INSTALL_VERSION="${XRAYR_VERSION:-v0.9.7-rc.3}"
 work_dir=""
 
 cleanup() {
@@ -175,7 +176,7 @@ prompt_node_type() {
                     warn "Hysteria 2 is available here only with the v2Pro UniProxy API."
                     continue
                 fi
-                if [[ "${SKIP_INSTALL}" != "1" && ( -z "${XRAYR_VERSION:-}" || "${XRAYR_VERSION}" == "v0.9.7-rc.1" || "${XRAYR_VERSION}" == "0.9.7-rc.1" ) ]]; then
+                if [[ "${SKIP_INSTALL}" != "1" && ( "${INSTALL_VERSION}" == "v0.9.7-rc.1" || "${INSTALL_VERSION}" == "0.9.7-rc.1" ) ]]; then
                     warn "Set XRAYR_VERSION to a newly published binary with Hysteria 2 integration first."
                     continue
                 fi
@@ -259,7 +260,7 @@ install_xrayr() {
     chmod +x "${work_dir}/install.sh"
     (
         cd "${work_dir}"
-        bash ./install.sh "${XRAYR_VERSION:-}"
+        bash ./install.sh "${INSTALL_VERSION}"
     )
 }
 
@@ -314,6 +315,11 @@ EOF
 write_config() {
     local config_dir backup_file temp_config
     local q_panel q_api q_key q_type q_domain q_cert q_key_file
+    local disable_local_reality=false
+
+    if [[ "${PANEL_TYPE}" == "NewV2board" && "${NODE_TYPE}" == "Vless" ]]; then
+        disable_local_reality=true
+    fi
 
     config_dir=$(dirname "${CONFIG_FILE}")
     mkdir -p "${config_dir}"
@@ -375,7 +381,7 @@ Nodes:
       DisableSniffing: false
       EnableProxyProtocol: false
       EnableFallback: false
-      DisableLocalREALITYConfig: false
+      DisableLocalREALITYConfig: ${disable_local_reality}
       EnableREALITY: false
       CertConfig:
         CertMode: "${CERT_MODE}"

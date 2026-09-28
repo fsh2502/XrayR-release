@@ -46,6 +46,8 @@ Nodes:
         Timeout: 5 # Thời gian chờ Redis (giây)
         Expiry: 60 # Thời gian hết hạn (giây)
       EnableFallback: false # Chỉ hỗ trợ Trojan và VLESS
+      DisableLocalREALITYConfig: false # Đặt true cho VLESS REALITY v2Pro để đọc tls_settings từ panel
+      EnableREALITY: false # Giữ false khi dùng REALITY từ panel
       FallBackConfigs:  # Có thể có nhiều đích fallback
         -
           SNI: # Tên miền TLS; để trống để khớp mọi tên
