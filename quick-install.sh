@@ -36,6 +36,11 @@ warn() {
     echo -e "${yellow}$*${plain}"
 }
 
+wizard_step() {
+    echo ""
+    echo "[$1/6] $2"
+}
+
 yaml_quote() {
     local value="$1"
     value=${value//\\/\\\\}
@@ -80,6 +85,7 @@ install_packages() {
 }
 
 prompt_domain() {
+    wizard_step 1 "Tên miền node"
     while true; do
         read -r -p "Domain của node (ví dụ node.example.com): " DOMAIN
         DOMAIN=${DOMAIN,,}
@@ -91,7 +97,7 @@ prompt_domain() {
 }
 
 prompt_panel_type() {
-    echo ""
+    wizard_step 2 "Loại panel"
     echo "Chọn loại panel:"
     echo "  1) SSpanel"
     echo "  2) NewV2board (mặc định)"
@@ -118,6 +124,7 @@ prompt_panel_type() {
 }
 
 prompt_api() {
+    wizard_step 3 "Kết nối API panel"
     while true; do
         read -r -p "API URL của panel (http:// hoặc https://): " API_HOST
         API_HOST=${API_HOST%/}
@@ -143,7 +150,7 @@ prompt_api() {
 }
 
 prompt_node_type() {
-    echo ""
+    wizard_step 4 "Loại node"
     echo "Chọn loại node:"
     echo "  1) V2ray"
     echo "  2) Vmess"
@@ -167,17 +174,17 @@ prompt_node_type() {
             6) NODE_TYPE="Shadowsocks"; return ;;
             7)
                 if [[ "${PANEL_TYPE}" == "NewV2board" || "${PANEL_TYPE}" == "V2board" ]]; then
-                    warn "v2Pro does not expose Shadowsocks-Plugin nodes. Choose Shadowsocks."
+                    warn "v2Pro không hỗ trợ node Shadowsocks-Plugin. Hãy chọn Shadowsocks."
                     continue
                 fi
                 NODE_TYPE="Shadowsocks-Plugin"; return ;;
             8)
                 if [[ "${PANEL_TYPE}" != "NewV2board" && "${PANEL_TYPE}" != "V2board" ]]; then
-                    warn "Hysteria 2 is available here only with the v2Pro UniProxy API."
+                    warn "Hysteria 2 ở đây chỉ dùng được với API UniProxy của v2Pro."
                     continue
                 fi
                 if [[ "${SKIP_INSTALL}" != "1" && ( "${INSTALL_VERSION}" == "v0.9.7-rc.1" || "${INSTALL_VERSION}" == "0.9.7-rc.1" ) ]]; then
-                    warn "Set XRAYR_VERSION to a newly published binary with Hysteria 2 integration first."
+                    warn "Hãy đặt XRAYR_VERSION thành bản binary mới có tích hợp Hysteria 2."
                     continue
                 fi
                 NODE_TYPE="Hysteria"; SELF_SIGNED_TLS=true; return ;;
@@ -196,15 +203,18 @@ prompt_tls_mode() {
     elif [[ "${NODE_TYPE}" == "Trojan" || "${NODE_TYPE}" == "Hysteria" ]]; then
         default_choice=2
     fi
-    echo ""
-    echo "TLS certificate: 1) none/REALITY  2) self-signed  3) existing PEM files"
+    wizard_step 5 "Chứng chỉ TLS"
+    echo "Chọn chế độ chứng chỉ:"
+    echo "  1) Không dùng chứng chỉ cục bộ (VLESS REALITY hoặc node không TLS)"
+    echo "  2) Tạo chứng chỉ tự ký"
+    echo "  3) Dùng tệp chứng chỉ PEM sẵn có"
     while true; do
-        read -r -p "Certificate choice [${default_choice}]: " choice
+        read -r -p "Lựa chọn [${default_choice}]: " choice
         choice=${choice:-$default_choice}
         case "${choice}" in
             1)
                 if [[ "${NODE_TYPE}" == "Trojan" || "${NODE_TYPE}" == "Hysteria" ]]; then
-                    warn "${NODE_TYPE} requires a TLS certificate."
+                    warn "${NODE_TYPE} cần có chứng chỉ TLS."
                     continue
                 fi
                 SELF_SIGNED_TLS=false
@@ -215,22 +225,31 @@ prompt_tls_mode() {
                 CERT_MODE="file"
                 return ;;
             3)
-                read -r -p "Certificate PEM path: " CERT_FILE
-                read -r -p "Private key PEM path: " KEY_FILE
+                read -r -p "Đường dẫn tệp chứng chỉ PEM: " CERT_FILE
+                read -r -p "Đường dẫn tệp khóa riêng PEM: " KEY_FILE
                 if [[ ! -f "${CERT_FILE}" || ! -f "${KEY_FILE}" ]]; then
-                    warn "Both certificate and private key files must exist."
+                    warn "Cần có cả tệp chứng chỉ và tệp khóa riêng."
                     continue
                 fi
                 SELF_SIGNED_TLS=false
                 CERT_MODE="file"
                 return ;;
-            *) warn "Invalid certificate choice." ;;
+            *) warn "Lựa chọn chứng chỉ không hợp lệ." ;;
         esac
     done
 }
 
 show_summary() {
-    echo ""
+    local cert_summary
+    if [[ "${SELF_SIGNED_TLS}" == true ]]; then
+        cert_summary="Chứng chỉ tự ký"
+    elif [[ "${CERT_MODE}" == "file" ]]; then
+        cert_summary="Tệp PEM sẵn có"
+    else
+        cert_summary="Không dùng chứng chỉ cục bộ"
+    fi
+
+    wizard_step 6 "Xác nhận cấu hình"
     echo "Thông tin sẽ cấu hình:"
     echo "  Tên miền:         ${DOMAIN}"
     echo "  Loại panel:       ${PANEL_TYPE}"
@@ -238,7 +257,11 @@ show_summary() {
     echo "  Khóa API:         ******"
     echo "  ID node:          ${NODE_ID}"
     echo "  Loại node:        ${NODE_TYPE}"
-    echo "  Chứng chỉ TLS:    ${CERT_MODE}$([[ "${SELF_SIGNED_TLS}" == true ]] && echo ' (tự ký)')"
+    echo "  Chứng chỉ TLS:    ${cert_summary}"
+    if [[ "${CERT_MODE}" == "file" && "${SELF_SIGNED_TLS}" != true ]]; then
+        echo "  Tệp chứng chỉ:   ${CERT_FILE}"
+        echo "  Tệp khóa riêng:  ${KEY_FILE}"
+    fi
     echo ""
 
     read -r -p "Tiếp tục cài đặt? [Y/n]: " CONFIRM
