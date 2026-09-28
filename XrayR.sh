@@ -3,9 +3,13 @@ set -u
 
 SCRIPT_REF="${XRAYR_INSTALL_REF:-upgrade-xray-core-26.9.9}"
 BASE_URL="https://raw.githubusercontent.com/fsh2502/XrayR-release/${SCRIPT_REF}"
-CONFIG_FILE="/etc/XrayR/config.yml"
-SERVICE_FILE="/etc/systemd/system/XrayR.service"
-BINARY="/usr/local/XrayR/XrayR"
+INSTALL_DIR="${XRAYR_INSTALL_DIR:-/usr/local/XrayR}"
+CONFIG_DIR="${XRAYR_CONFIG_DIR:-/etc/XrayR}"
+SERVICE_FILE="${XRAYR_SERVICE_FILE:-/etc/systemd/system/XrayR.service}"
+MANAGER_FILE="${XRAYR_MANAGER_FILE:-/usr/bin/XrayR}"
+ALIAS_FILE="${XRAYR_ALIAS_FILE:-/usr/bin/xrayr}"
+CONFIG_FILE="${CONFIG_DIR}/config.yml"
+BINARY="${INSTALL_DIR}/XrayR"
 
 error() { printf 'Lỗi: %s\n' "$*" >&2; return 1; }
 installed() { [[ -f "$SERVICE_FILE" && -x "$BINARY" ]]; }
@@ -40,18 +44,32 @@ edit_config() {
 }
 
 uninstall_xrayr() {
-    require_root && require_install || return 1
-    printf 'Gỡ XrayR? Cấu hình trong /etc/XrayR sẽ được giữ lại. [y/N]: '
+    require_root || return 1
+    [[ -e "$SERVICE_FILE" || -e "$BINARY" || -e "$MANAGER_FILE" || -L "$ALIAS_FILE" ]] \
+        || { error "Không tìm thấy tệp cài đặt XrayR để gỡ."; return 1; }
+    printf 'Gỡ XrayR? Cấu hình và bản sao lưu sẽ được giữ lại. [y/N]: '
     local answer
-    read -r answer
+    read -r answer || return 1
     [[ "$answer" == y || "$answer" == Y ]] || { printf 'Đã hủy.\n'; return 0; }
     systemctl stop XrayR || true
+    if systemctl is-active --quiet XrayR; then
+        error "Không dừng được dịch vụ XrayR; chưa xóa tệp cài đặt."
+        return 1
+    fi
     systemctl disable XrayR || true
-    rm -f -- "$SERVICE_FILE"
-    systemctl daemon-reload
-    # Chỉ xóa binary và dữ liệu cài đặt; không xóa cấu hình/chứng chỉ của người dùng.
-    rm -f -- "$BINARY"
-    printf 'Đã gỡ XrayR. Cấu hình vẫn ở /etc/XrayR.\n'
+    if systemctl is-enabled --quiet XrayR; then
+        error "Không tắt được tự khởi động XrayR; chưa xóa tệp cài đặt."
+        return 1
+    fi
+    rm -f -- "$SERVICE_FILE" "$BINARY" || return 1
+    systemctl daemon-reload || return 1
+    if [[ -L "$ALIAS_FILE" && "$(readlink "$ALIAS_FILE")" == "$MANAGER_FILE" ]]; then
+        rm -f -- "$ALIAS_FILE" || return 1
+    fi
+    rm -f -- "$MANAGER_FILE" || return 1
+    printf 'Đã gỡ dịch vụ, binary và trình quản lý XrayR.\n'
+    printf 'Cấu hình, chứng chỉ và bản sao lưu vẫn còn. Nếu không cần chúng, chạy:\n'
+    printf '  rm -rf -- %q %q\n' "$CONFIG_DIR" "$INSTALL_DIR"
 }
 
 show_version() { require_install && "$BINARY" version; }
@@ -66,7 +84,7 @@ update_shell() {
     local temp_file
     temp_file=$(mktemp) || return 1
     if curl -fsSL "${BASE_URL}/XrayR.sh" -o "$temp_file"; then
-        install -m 755 "$temp_file" /usr/bin/XrayR
+        install -m 755 "$temp_file" "$MANAGER_FILE"
         printf 'Đã cập nhật trình quản lý.\n'
     else
         error "Không tải được trình quản lý."
@@ -87,7 +105,7 @@ Trình quản lý XrayR (dành cho bản cài systemd, không dùng cho Docker)
   XrayR enable|disable  Bật/tắt khởi động cùng hệ thống
   XrayR log             Xem nhật ký
   XrayR version         Xem phiên bản
-  XrayR uninstall       Gỡ binary, giữ cấu hình
+  XrayR uninstall       Gỡ chương trình, giữ cấu hình và gợi ý lệnh dọn sạch
   XrayR update_shell    Cập nhật trình quản lý
 EOF
 }

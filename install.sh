@@ -8,6 +8,8 @@ SCRIPT_REF="${XRAYR_INSTALL_REF:-upgrade-xray-core-26.9.9}"
 INSTALL_DIR="${XRAYR_INSTALL_DIR:-/usr/local/XrayR}"
 CONFIG_DIR="${XRAYR_CONFIG_DIR:-/etc/XrayR}"
 SERVICE_FILE="${XRAYR_SERVICE_FILE:-/etc/systemd/system/XrayR.service}"
+MANAGER_FILE="${XRAYR_MANAGER_FILE:-/usr/bin/XrayR}"
+ALIAS_FILE="${XRAYR_ALIAS_FILE:-/usr/bin/xrayr}"
 tmp_dir=""
 
 say() { printf '%s\n' "$*"; }
@@ -109,8 +111,8 @@ if [[ "$was_active" -eq 1 ]]; then
 fi
 
 curl -fsSL "https://raw.githubusercontent.com/${SCRIPT_REPO}/${SCRIPT_REF}/XrayR.sh" \
-    -o "$tmp_dir/XrayR.sh" && install -m 755 "$tmp_dir/XrayR.sh" /usr/bin/XrayR || true
-if [[ ! -e /usr/bin/xrayr ]]; then ln -s /usr/bin/XrayR /usr/bin/xrayr; fi
+    -o "$tmp_dir/XrayR.sh" && install -m 755 "$tmp_dir/XrayR.sh" "$MANAGER_FILE" || true
+if [[ ! -e "$ALIAS_FILE" && ! -L "$ALIAS_FILE" ]]; then ln -s "$MANAGER_FILE" "$ALIAS_FILE"; fi
 
 say "Đã cài XrayR ${version}. Cấu hình cũ được giữ tại $CONFIG_DIR."
 if [[ "$was_active" -eq 0 && -z "$backup" ]]; then

@@ -36,6 +36,8 @@ Nếu đã có cấu hình và chỉ muốn nâng binary, tải script trên cù
 
 Sau cài đặt, chạy `XrayR` để mở menu hoặc dùng `XrayR status`, `XrayR log`, `XrayR update [phiên-bản]`. Cấu hình nằm ở `/etc/XrayR/config.yml`; xem [mẫu cấu hình](config/config.yml).
 
+Gỡ cài đặt bằng mục 12 trong menu hoặc `XrayR uninstall`. Lệnh gỡ dừng dịch vụ, xóa service, binary, trình quản lý và liên kết `xrayr`; cấu hình, chứng chỉ và bản sao lưu vẫn được giữ. Sau khi gỡ thành công, màn hình hiện lệnh `rm -rf -- /etc/XrayR /usr/local/XrayR` để bạn tự xóa các thư mục còn lại nếu không cần dữ liệu trong đó.
+
 ## Lưu ý tương thích khi nâng lõi
 
 Xray-core 26.9.9 đã bỏ các header vận chuyển cũ `srtp`, `tls`, `utp`, `wechat`, `wireguard`, Shadowsocks `none/plain` và tùy chọn `DisableIVCheck`. Hãy kiểm tra các node trước khi nâng cấp. Dịch vụ chạy thành công chưa đủ chứng minh client kết nối được; thử từng giao thức, TLS/REALITY và thống kê lưu lượng trên nút thử nghiệm. Bản `v0.9.6` vẫn là lựa chọn ổn định trong lúc kiểm tra.
