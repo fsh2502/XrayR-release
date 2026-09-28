@@ -7,7 +7,8 @@ green='\033[0;32m'
 yellow='\033[0;33m'
 plain='\033[0m'
 
-INSTALL_URL="https://raw.githubusercontent.com/fsh2502/XrayR-release/master/install.sh"
+INSTALL_REF="${XRAYR_INSTALL_REF:-master}"
+INSTALL_URL="${XRAYR_INSTALL_URL:-https://raw.githubusercontent.com/fsh2502/XrayR-release/${INSTALL_REF}/install.sh}"
 CONFIG_FILE="${XRAYR_CONFIG_FILE:-/etc/XrayR/config.yml}"
 CERT_DIR="${XRAYR_CERT_DIR:-/etc/XrayR/cert}"
 SKIP_INSTALL="${XRAYR_SKIP_INSTALL:-0}"
@@ -172,13 +173,13 @@ prompt_node_type() {
 show_summary() {
     echo ""
     echo "Thông tin sẽ cấu hình:"
-    echo "  Domain:    ${DOMAIN}"
-    echo "  PanelType: ${PANEL_TYPE}"
-    echo "  API URL:   ${API_HOST}"
-    echo "  API key:   ******"
-    echo "  Node ID:   ${NODE_ID}"
-    echo "  NodeType:  ${NODE_TYPE}"
-    echo "  TLS cert:  $([[ "${SELF_SIGNED_TLS}" == true ]] && echo 'self-signed' || echo 'none')"
+    echo "  Tên miền:         ${DOMAIN}"
+    echo "  Loại panel:       ${PANEL_TYPE}"
+    echo "  Địa chỉ API:      ${API_HOST}"
+    echo "  Khóa API:         ******"
+    echo "  ID node:          ${NODE_ID}"
+    echo "  Loại node:        ${NODE_TYPE}"
+    echo "  Chứng chỉ TLS:    $([[ "${SELF_SIGNED_TLS}" == true ]] && echo 'tự ký' || echo 'không dùng')"
     echo ""
 
     read -r -p "Tiếp tục cài đặt? [Y/n]: " CONFIRM
@@ -200,7 +201,7 @@ install_xrayr() {
     chmod +x "${work_dir}/install.sh"
     (
         cd "${work_dir}"
-        bash ./install.sh
+        bash ./install.sh "${XRAYR_VERSION:-}"
     )
 }
 
@@ -361,7 +362,7 @@ main() {
     fi
 
     echo "============================================"
-    echo "       XrayR quick install + config"
+    echo "       Cài nhanh và cấu hình XrayR"
     echo "============================================"
 
     prompt_domain

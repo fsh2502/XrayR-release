@@ -3,6 +3,6 @@ services:
   xrayr: 
     image: ghcr.io/fsh2502/xrayr:latest
     volumes:
-      - ./config:/etc/XrayR/ # 映射配置文件夹
+      - ./config:/etc/XrayR/ # Gắn thư mục cấu hình vào container
     restart: always
     network_mode: host
