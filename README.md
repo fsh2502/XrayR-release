@@ -4,7 +4,7 @@
 
 Trong `quick-install.sh`, chọn `NewV2board` cho panel [v2Pro](https://github.com/fsh2502/v2Pro). Chọn node VMess, VLESS, Trojan, Shadowsocks hoặc Hysteria 2 (không obfs), đúng với loại node đã tạo trên panel. Với TLS, chọn chứng chỉ tự ký hoặc đường dẫn PEM sẵn có; với REALITY, chọn chế độ không có chứng chỉ. Hysteria 1, Hysteria 2 có obfs, TUIC và AnyTLS chưa được backend XrayR này hỗ trợ. `v2node` không được dùng ở đây.
 
-Bản thử nghiệm `v0.9.7-rc.3` sửa luồng VLESS REALITY từ v2Pro: dùng `tls_settings` của panel, không cần chứng chỉ TLS riêng và không chạy tác vụ gia hạn chứng chỉ. Binary `v0.9.7-rc.2` chưa có sửa lỗi REALITY này.
+Bản thử nghiệm `v0.9.7-rc.4` giữ Xray-core 26.9.9 và dùng commit REALITY ngay trước thay đổi kiểm tra ClientHello mới để tương thích với sing-box/Hiddify. Bản `v0.9.7-rc.3` hoạt động với client Xray-core nhưng bị sing-box 1.14.0 từ chối ở bước xác thực REALITY. `rc.4` vẫn có các sửa lỗi đọc `tls_settings` v2Pro của `rc.3`.
 
 Kho này chứa trình cài đặt, trình quản lý, mẫu cấu hình và tệp Docker cho [XrayR](https://github.com/fsh2502/XrayR). Giao diện và hướng dẫn được viết bằng tiếng Việt; các khóa cấu hình YAML giữ nguyên tên để tương thích.
 
@@ -24,15 +24,15 @@ curl -fsSL https://raw.githubusercontent.com/fsh2502/XrayR-release/master/instal
 bash install.sh
 ```
 
-Để chọn phiên bản, dùng `bash install.sh v0.9.6`. Bản thử nghiệm nâng Xray-core 26.9.9 không phải bản ổn định; cần chỉ định tag `v0.9.7-rc.3` khi gọi trực tiếp `install.sh`. Trình cài đặt trên nhánh `upgrade-xray-core-26.9.9` kiểm tra SHA-256, giữ nguyên cấu hình, sao lưu binary và tự khôi phục nếu XrayR không khởi động.
+Để chọn phiên bản, dùng `bash install.sh v0.9.6`. Bản thử nghiệm nâng Xray-core 26.9.9 không phải bản ổn định; cần chỉ định tag `v0.9.7-rc.4` khi gọi trực tiếp `install.sh`. Trình cài đặt trên nhánh `upgrade-xray-core-26.9.9` kiểm tra SHA-256, giữ nguyên cấu hình, sao lưu binary và tự khôi phục nếu XrayR không khởi động.
 
-Thử bản `v0.9.7-rc.3` trên VPS/node riêng (không thay bản ổn định mặc định). `quick-install.sh` trên nhánh này cũng chọn bản đó khi không đặt `XRAYR_VERSION`:
+Thử bản `v0.9.7-rc.4` trên VPS/node riêng (không thay bản ổn định mặc định). `quick-install.sh` trên nhánh này cũng chọn bản đó khi không đặt `XRAYR_VERSION`:
 
 ```bash
-XRAYR_VERSION=v0.9.7-rc.3 bash <(curl -fsSL https://raw.githubusercontent.com/fsh2502/XrayR-release/upgrade-xray-core-26.9.9/quick-install.sh)
+XRAYR_VERSION=v0.9.7-rc.4 bash <(curl -fsSL https://raw.githubusercontent.com/fsh2502/XrayR-release/upgrade-xray-core-26.9.9/quick-install.sh)
 ```
 
-Nếu đã có cấu hình và chỉ muốn nâng binary, tải script trên cùng nhánh rồi gọi `bash install.sh v0.9.7-rc.3`. Với VLESS REALITY từ v2Pro, đặt `DisableLocalREALITYConfig: true` và `EnableREALITY: false` trong `ControllerConfig`, `CertMode: none` trong `CertConfig`; panel phải có `tls=2`, khóa REALITY, `server_name` và `short_id` hợp lệ. Hãy thử client, TLS/REALITY và báo cáo lưu lượng trên node thử nghiệm trước khi nâng node đang phục vụ người dùng.
+Nếu đã có cấu hình và chỉ muốn nâng binary, dùng `XrayR update v0.9.7-rc.4` hoặc tải `install.sh` trên cùng nhánh rồi gọi `bash install.sh v0.9.7-rc.4`. Với VLESS REALITY từ v2Pro, đặt `DisableLocalREALITYConfig: true` và `EnableREALITY: false` trong `ControllerConfig`, `CertMode: none` trong `CertConfig`; panel phải có `tls=2`, khóa REALITY, `server_name` và `short_id` hợp lệ. Hãy thử client, TLS/REALITY và báo cáo lưu lượng trên node thử nghiệm trước khi nâng node đang phục vụ người dùng.
 
 Sau cài đặt, chạy `XrayR` để mở menu hoặc dùng `XrayR status`, `XrayR log`, `XrayR update [phiên-bản]`. Cấu hình nằm ở `/etc/XrayR/config.yml`; xem [mẫu cấu hình](config/config.yml).
 
@@ -40,7 +40,7 @@ Gỡ cài đặt bằng mục 12 trong menu hoặc `XrayR uninstall`. Lệnh g�
 
 ## Lưu ý tương thích khi nâng lõi
 
-Xray-core 26.9.9 đã bỏ các header vận chuyển cũ `srtp`, `tls`, `utp`, `wechat`, `wireguard`, Shadowsocks `none/plain` và tùy chọn `DisableIVCheck`. Hãy kiểm tra các node trước khi nâng cấp. Dịch vụ chạy thành công chưa đủ chứng minh client kết nối được; thử từng giao thức, TLS/REALITY và thống kê lưu lượng trên nút thử nghiệm. Bản `v0.9.6` vẫn là lựa chọn ổn định trong lúc kiểm tra.
+Xray-core 26.9.9 đã bỏ các header vận chuyển cũ `srtp`, `tls`, `utp`, `wechat`, `wireguard`, Shadowsocks `none/plain` và tùy chọn `DisableIVCheck`. Hãy kiểm tra các node trước khi nâng cấp. Để tương thích sing-box, bản `rc.4` chưa áp dụng quy tắc REALITY mới yêu cầu ClientHello có X25519MLKEM768 đứng trước X25519; commit REALITY được chọn vẫn chứa sửa lỗi rò rỉ tài nguyên ngay trước quy tắc đó. Dịch vụ chạy thành công chưa đủ chứng minh client kết nối được; thử từng giao thức, TLS/REALITY và thống kê lưu lượng trên nút thử nghiệm. Bản `v0.9.6` vẫn là lựa chọn ổn định trong lúc kiểm tra.
 
 ## Docker
 
