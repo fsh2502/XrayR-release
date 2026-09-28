@@ -7,7 +7,7 @@ green='\033[0;32m'
 yellow='\033[0;33m'
 plain='\033[0m'
 
-INSTALL_REF="${XRAYR_INSTALL_REF:-master}"
+INSTALL_REF="${XRAYR_INSTALL_REF:-upgrade-xray-core-26.9.9}"
 INSTALL_URL="${XRAYR_INSTALL_URL:-https://raw.githubusercontent.com/fsh2502/XrayR-release/${INSTALL_REF}/install.sh}"
 CONFIG_FILE="${XRAYR_CONFIG_FILE:-/etc/XrayR/config.yml}"
 CERT_DIR="${XRAYR_CERT_DIR:-/etc/XrayR/cert}"
