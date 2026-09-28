@@ -19,7 +19,7 @@ Nodes:
       ApiHost: "http://127.0.0.1:667"
       ApiKey: "123"
       NodeID: 41
-      NodeType: V2ray # Loại node: V2ray, Vmess, Vless, Shadowsocks, Trojan, Shadowsocks-Plugin
+      NodeType: V2ray # Với NewV2board/v2Pro: Vmess, Vless, Trojan, Shadowsocks, Hysteria (v2 không obfs); V2ray là alias VMess
       Timeout: 30 # Thời gian chờ API (giây)
       EnableVless: false # Bật VLESS cho loại V2ray
       EnableXTLS: false # Bật XTLS cho V2ray và Trojan

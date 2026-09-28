@@ -147,11 +147,11 @@ prompt_node_type() {
     echo "  1) V2ray"
     echo "  2) Vmess"
     echo "  3) Vless"
-    echo "  4) Trojan + TLS (tự tạo chứng chỉ tự ký)"
-    echo "  5) Trojan (không tạo chứng chỉ cục bộ)"
+    echo "  4) Trojan (chứng chỉ tự ký)"
+    echo "  5) Trojan (chứng chỉ PEM sẵn có)"
     echo "  6) Shadowsocks"
-    echo "  7) Shadowsocks-Plugin"
-
+    echo "  7) Shadowsocks-Plugin (panel khác)"
+    echo "  8) Hysteria 2"
     SELF_SIGNED_TLS=false
     ENABLE_VLESS=false
     while true; do
@@ -164,8 +164,66 @@ prompt_node_type() {
             4) NODE_TYPE="Trojan"; SELF_SIGNED_TLS=true; return ;;
             5) NODE_TYPE="Trojan"; return ;;
             6) NODE_TYPE="Shadowsocks"; return ;;
-            7) NODE_TYPE="Shadowsocks-Plugin"; return ;;
+            7)
+                if [[ "${PANEL_TYPE}" == "NewV2board" || "${PANEL_TYPE}" == "V2board" ]]; then
+                    warn "v2Pro does not expose Shadowsocks-Plugin nodes. Choose Shadowsocks."
+                    continue
+                fi
+                NODE_TYPE="Shadowsocks-Plugin"; return ;;
+            8)
+                if [[ "${PANEL_TYPE}" != "NewV2board" && "${PANEL_TYPE}" != "V2board" ]]; then
+                    warn "Hysteria 2 is available here only with the v2Pro UniProxy API."
+                    continue
+                fi
+                if [[ "${SKIP_INSTALL}" != "1" && ( -z "${XRAYR_VERSION:-}" || "${XRAYR_VERSION}" == "v0.9.7-rc.1" || "${XRAYR_VERSION}" == "0.9.7-rc.1" ) ]]; then
+                    warn "Set XRAYR_VERSION to a newly published binary with Hysteria 2 integration first."
+                    continue
+                fi
+                NODE_TYPE="Hysteria"; SELF_SIGNED_TLS=true; return ;;
             *) warn "Lựa chọn không hợp lệ." ;;
+        esac
+    done
+}
+
+prompt_tls_mode() {
+    local default_choice=1 choice
+    CERT_MODE="none"
+    CERT_FILE=""
+    KEY_FILE=""
+    if [[ "${NODE_CHOICE}" == "5" ]]; then
+        default_choice=3
+    elif [[ "${NODE_TYPE}" == "Trojan" || "${NODE_TYPE}" == "Hysteria" ]]; then
+        default_choice=2
+    fi
+    echo ""
+    echo "TLS certificate: 1) none/REALITY  2) self-signed  3) existing PEM files"
+    while true; do
+        read -r -p "Certificate choice [${default_choice}]: " choice
+        choice=${choice:-$default_choice}
+        case "${choice}" in
+            1)
+                if [[ "${NODE_TYPE}" == "Trojan" || "${NODE_TYPE}" == "Hysteria" ]]; then
+                    warn "${NODE_TYPE} requires a TLS certificate."
+                    continue
+                fi
+                SELF_SIGNED_TLS=false
+                CERT_MODE="none"
+                return ;;
+            2)
+                SELF_SIGNED_TLS=true
+                CERT_MODE="file"
+                return ;;
+            3)
+                read -r -p "Certificate PEM path: " CERT_FILE
+                read -r -p "Private key PEM path: " KEY_FILE
+                if [[ ! -f "${CERT_FILE}" || ! -f "${KEY_FILE}" ]]; then
+                    warn "Both certificate and private key files must exist."
+                    continue
+                fi
+                SELF_SIGNED_TLS=false
+                CERT_MODE="file"
+                return ;;
+            *) warn "Invalid certificate choice." ;;
         esac
     done
 }
@@ -179,7 +237,7 @@ show_summary() {
     echo "  Khóa API:         ******"
     echo "  ID node:          ${NODE_ID}"
     echo "  Loại node:        ${NODE_TYPE}"
-    echo "  Chứng chỉ TLS:    $([[ "${SELF_SIGNED_TLS}" == true ]] && echo 'tự ký' || echo 'không dùng')"
+    echo "  Chứng chỉ TLS:    ${CERT_MODE}$([[ "${SELF_SIGNED_TLS}" == true ]] && echo ' (tự ký)')"
     echo ""
 
     read -r -p "Tiếp tục cài đặt? [Y/n]: " CONFIRM
@@ -211,9 +269,6 @@ create_self_signed_certificate() {
     local key_file="${CERT_DIR}/${DOMAIN}.key"
 
     if [[ "${SELF_SIGNED_TLS}" != true ]]; then
-        CERT_MODE="none"
-        CERT_FILE=""
-        KEY_FILE=""
         return
     fi
 
@@ -369,13 +424,14 @@ main() {
     prompt_panel_type
     prompt_api
     prompt_node_type
+    prompt_tls_mode
     show_summary
     install_xrayr
     create_self_signed_certificate
     write_config
 
     if [[ "${SELF_SIGNED_TLS}" == true ]]; then
-        warn "Trojan TLS dùng chứng chỉ tự ký. Client phải tin cậy chứng chỉ này hoặc bật allowInsecure."
+        warn "${NODE_TYPE} TLS dùng chứng chỉ tự ký. Client phải tin cậy chứng chỉ này hoặc bật allowInsecure."
         warn "Node trên panel cũng phải bật TLS và dùng domain ${DOMAIN}."
     fi
 

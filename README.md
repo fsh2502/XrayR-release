@@ -1,5 +1,11 @@
 # Cài đặt XrayR
 
+## Node v2Pro trên nhánh Xray-core 26.9.9
+
+Trong `quick-install.sh`, chọn `NewV2board` cho panel [v2Pro](https://github.com/fsh2502/v2Pro). Chọn node VMess, VLESS, Trojan, Shadowsocks hoặc Hysteria 2 (không obfs), đúng với loại node đã tạo trên panel. Với TLS, chọn chứng chỉ tự ký hoặc đường dẫn PEM sẵn có; với REALITY, chọn chế độ không có chứng chỉ. Hysteria 1, Hysteria 2 có obfs, TUIC và AnyTLS chưa được backend XrayR này hỗ trợ. `v2node` không được dùng ở đây.
+
+Bản thử nghiệm `v0.9.7-rc.2` chứa chức năng Hysteria 2 và các sửa đổi UniProxy. Binary `v0.9.7-rc.1` không chứa các sửa đổi này.
+
 Kho này chứa trình cài đặt, trình quản lý, mẫu cấu hình và tệp Docker cho [XrayR](https://github.com/fsh2502/XrayR). Giao diện và hướng dẫn được viết bằng tiếng Việt; các khóa cấu hình YAML giữ nguyên tên để tương thích.
 
 ## Cài nhanh có hướng dẫn
@@ -18,15 +24,15 @@ curl -fsSL https://raw.githubusercontent.com/fsh2502/XrayR-release/master/instal
 bash install.sh
 ```
 
-Để chọn phiên bản, dùng `bash install.sh v0.9.6`. Bản thử nghiệm nâng Xray-core 26.9.9 không phải bản ổn định; cần chỉ định tag `v0.9.7-rc.1`. Trình cài đặt trên nhánh `upgrade-xray-core-26.9.9` kiểm tra SHA-256, giữ nguyên cấu hình, sao lưu binary và tự khôi phục nếu XrayR không khởi động.
+Để chọn phiên bản, dùng `bash install.sh v0.9.6`. Bản thử nghiệm nâng Xray-core 26.9.9 không phải bản ổn định; cần chỉ định tag `v0.9.7-rc.2`. Trình cài đặt trên nhánh `upgrade-xray-core-26.9.9` kiểm tra SHA-256, giữ nguyên cấu hình, sao lưu binary và tự khôi phục nếu XrayR không khởi động.
 
-Thử bản `v0.9.7-rc.1` trên VPS/node riêng (không thay bản ổn định mặc định):
+Thử bản `v0.9.7-rc.2` trên VPS/node riêng (không thay bản ổn định mặc định):
 
 ```bash
-XRAYR_VERSION=v0.9.7-rc.1 bash <(curl -fsSL https://raw.githubusercontent.com/fsh2502/XrayR-release/upgrade-xray-core-26.9.9/quick-install.sh)
+XRAYR_VERSION=v0.9.7-rc.2 bash <(curl -fsSL https://raw.githubusercontent.com/fsh2502/XrayR-release/upgrade-xray-core-26.9.9/quick-install.sh)
 ```
 
-Nếu đã có cấu hình và chỉ muốn nâng binary, tải script trên cùng nhánh rồi gọi `bash install.sh v0.9.7-rc.1`. Hãy thử client, TLS/REALITY và báo cáo lưu lượng trên node thử nghiệm trước khi nâng node đang phục vụ người dùng.
+Nếu đã có cấu hình và chỉ muốn nâng binary, tải script trên cùng nhánh rồi gọi `bash install.sh v0.9.7-rc.2`. Hãy thử client, TLS/REALITY và báo cáo lưu lượng trên node thử nghiệm trước khi nâng node đang phục vụ người dùng.
 
 Sau cài đặt, chạy `XrayR` để mở menu hoặc dùng `XrayR status`, `XrayR log`, `XrayR update [phiên-bản]`. Cấu hình nằm ở `/etc/XrayR/config.yml`; xem [mẫu cấu hình](config/config.yml).
 
