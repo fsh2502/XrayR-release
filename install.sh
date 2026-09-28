@@ -57,7 +57,7 @@ base="https://github.com/${REPO}/releases/download/${version}/${asset}"
 say "Đang tải XrayR ${version} (${arch})..."
 curl -fL --retry 3 -o "$tmp_dir/$asset" "$base" || die "Không tải được gói cài đặt."
 curl -fL --retry 3 -o "$tmp_dir/$asset.dgst" "$base.dgst" || die "Không tải được mã kiểm tra SHA-256."
-expected=$(awk 'tolower($1) ~ /sha.*256/ {print $NF}' "$tmp_dir/$asset.dgst" | tail -n 1)
+expected=$(tr -d '\r' < "$tmp_dir/$asset.dgst" | awk 'tolower($1) ~ /sha.*256/ {print $NF}' | tail -n 1)
 [[ "$expected" =~ ^[0-9a-fA-F]{64}$ ]] || die "Mã SHA-256 trong bản phát hành không hợp lệ."
 actual=$(sha256sum "$tmp_dir/$asset" | awk '{print $1}')
 [[ "${actual,,}" == "${expected,,}" ]] || die "SHA-256 không khớp; không thay đổi bản đang chạy."
