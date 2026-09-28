@@ -48,6 +48,8 @@ Xray-core 26.9.9 đã bỏ các header vận chuyển cũ `srtp`, `tls`, `utp`, 
 
 Lưu lượng gửi về `/push` là byte ứng dụng theo hai chiều (lên, xuống). v2Pro áp dụng `rate` của node khi cộng vào hạn mức tài khoản. `rc.5` giữ lại các byte phát sinh trong lúc đợi panel xác nhận báo cáo, và chỉ xóa phần đã gửi khi panel trả `data: true`.
 
+Mã v2Pro gốc còn hai giới hạn trong tác vụ `traffic:update`: truy vấn người dùng chỉ theo danh sách có tải xuống nên có thể bỏ qua phiên chỉ tải lên; thao tác đọc rồi xóa hash Redis có thể mất lượt ghi đồng thời. Vì vậy số liệu tài khoản trên panel chưa được bảo đảm chính xác tuyệt đối cho đến khi sửa riêng tác vụ này trên panel.
+
 ## Docker
 
 ```bash
