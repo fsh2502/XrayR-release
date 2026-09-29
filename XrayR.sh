@@ -137,11 +137,20 @@ show_menu() {
             printf 'Trạng thái: chưa cài đặt\n'
         fi
         cat <<'EOF'
-  1) Cài đặt             2) Nâng cấp             3) Sửa cấu hình
-  4) Khởi động           5) Dừng                 6) Khởi động lại
-  7) Trạng thái          8) Nhật ký              9) Phiên bản
- 10) Tự khởi động       11) Tắt tự khởi động    12) Gỡ cài đặt
- 13) Cập nhật menu       0) Thoát
+  1) Cài đặt
+  2) Nâng cấp
+  3) Sửa cấu hình
+  4) Khởi động
+  5) Dừng
+  6) Khởi động lại
+  7) Trạng thái
+  8) Nhật ký
+  9) Phiên bản
+ 10) Tự khởi động
+ 11) Tắt tự khởi động
+ 12) Gỡ cài đặt
+ 13) Cập nhật menu
+  0) Thoát
 EOF
         read -r -p 'Chọn: ' choice || return 0
         case "$choice" in
