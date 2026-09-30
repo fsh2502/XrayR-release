@@ -2,7 +2,7 @@
 set -u
 
 SCRIPT_REF="${XRAYR_INSTALL_REF:-v0.9.8}"
-BASE_URL="https://raw.githubusercontent.com/fsh2502/XrayR-release/${SCRIPT_REF}"
+BASE_URL="https://raw.githubusercontent.com/fsh2502/XrayR-Installer/${SCRIPT_REF}"
 INSTALL_DIR="${XRAYR_INSTALL_DIR:-/usr/local/XrayR}"
 CONFIG_DIR="${XRAYR_CONFIG_DIR:-/etc/XrayR}"
 SERVICE_FILE="${XRAYR_SERVICE_FILE:-/etc/systemd/system/XrayR.service}"
@@ -130,7 +130,7 @@ run_command() {
 show_menu() {
     local choice
     while true; do
-        printf '\nTrình quản lý XrayR — https://github.com/fsh2502/XrayR\n'
+        printf '\nTrình quản lý XrayR — https://github.com/fsh2502/XrayR-Installer\n'
         if installed; then
             printf 'Trạng thái: %s\n' "$(systemctl is-active XrayR 2>/dev/null || true)"
         else

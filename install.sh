@@ -2,8 +2,8 @@
 set -Eeuo pipefail
 
 # Cài đặt/nâng cấp XrayR, giữ nguyên cấu hình và tự khôi phục binary nếu khởi động lỗi.
-REPO="${XRAYR_BINARY_REPO:-fsh2502/XrayR}"
-SCRIPT_REPO="${XRAYR_SCRIPT_REPO:-fsh2502/XrayR-release}"
+REPO="${XRAYR_BINARY_REPO:-fsh2502/XrayR-Installer}"
+SCRIPT_REPO="${XRAYR_SCRIPT_REPO:-fsh2502/XrayR-Installer}"
 SCRIPT_REF="${XRAYR_INSTALL_REF:-v0.9.8}"
 INSTALL_DIR="${XRAYR_INSTALL_DIR:-/usr/local/XrayR}"
 CONFIG_DIR="${XRAYR_CONFIG_DIR:-/etc/XrayR}"

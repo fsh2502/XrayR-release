@@ -5,7 +5,7 @@ Hỗ trợ máy chủ Linux `amd64`, `arm64` hoặc `s390x` dùng systemd. Chạ
 ## Cài nhanh và cấu hình node
 
 ```bash
-curl -fsSLo quick-install.sh https://raw.githubusercontent.com/fsh2502/XrayR-release/v0.9.8/quick-install.sh
+curl -fsSLo quick-install.sh https://raw.githubusercontent.com/fsh2502/XrayR-Installer/v0.9.8/quick-install.sh
 sudo bash quick-install.sh
 ```
 
@@ -14,7 +14,7 @@ Nhập tên miền, loại panel, địa chỉ API, API key, ID node và giao th
 ## Cài thủ công hoặc nâng cấp
 
 ```bash
-curl -fsSLo install.sh https://raw.githubusercontent.com/fsh2502/XrayR-release/v0.9.8/install.sh
+curl -fsSLo install.sh https://raw.githubusercontent.com/fsh2502/XrayR-Installer/v0.9.8/install.sh
 sudo bash install.sh v0.9.8
 sudo nano /etc/XrayR/config.yml
 sudo systemctl start XrayR
@@ -25,7 +25,7 @@ Khi cài lần đầu, sửa `ApiHost`, `ApiKey`, `NodeID` và `NodeType` trong 
 
 ## Cài từ gói độc lập
 
-Chép tệp `XrayR-standalone-v0.9.8.zip` lên máy chủ, rồi chạy:
+Tải [XrayR-standalone-v0.9.8.zip](https://github.com/fsh2502/XrayR-Installer/releases/download/v0.9.8/XrayR-standalone-v0.9.8.zip), chép lên máy chủ, rồi chạy:
 
 ```bash
 unzip XrayR-standalone-v0.9.8.zip
@@ -34,3 +34,5 @@ sudo bash quick-install.sh
 ```
 
 Gói này chứa sẵn binary cho ba kiến trúc trên, nên không cần tải binary khi cài. Để tự sửa cấu hình, chạy `sudo bash install.sh`, chỉnh `/etc/XrayR/config.yml`, rồi `sudo systemctl start XrayR`.
+
+Người nhận binary có thể [yêu cầu mã nguồn tương ứng của v0.9.8](https://github.com/fsh2502/XrayR-Installer/blob/v0.9.8/SOURCE.md) theo MPL 2.0.
