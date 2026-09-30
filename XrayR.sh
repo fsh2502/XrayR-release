@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -u
 
-SCRIPT_REF="${XRAYR_INSTALL_REF:-upgrade-xray-core-26.9.9}"
+SCRIPT_REF="${XRAYR_INSTALL_REF:-v0.9.8}"
 BASE_URL="https://raw.githubusercontent.com/fsh2502/XrayR-release/${SCRIPT_REF}"
 INSTALL_DIR="${XRAYR_INSTALL_DIR:-/usr/local/XrayR}"
 CONFIG_DIR="${XRAYR_CONFIG_DIR:-/etc/XrayR}"
